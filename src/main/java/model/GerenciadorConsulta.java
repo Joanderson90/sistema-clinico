@@ -13,6 +13,7 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import dao.AgendaConsultaDAO;
 import dao.ConsultaDAO;
@@ -25,7 +26,7 @@ import date.MyDate;
 public class GerenciadorConsulta {
 
 	/**
-	 * Verifica se uma consulta está marcada para algum paciente
+	 * Verifica se uma consulta está marcada para algum paciente ou médico
 	 * 
 	 * @param CPF_Target
 	 * @return boolean
@@ -61,66 +62,84 @@ public class GerenciadorConsulta {
 	}
 
 	/**
-	 * Metodo que remove todas as consultas de um medico
+	 * Metodo que remove todas as consultas de um médico ou paciente
 	 * 
 	 * @param CPF_Target
 	 * @throws Exception
 	 */
-	public static void removeAllConsultaContainsCPF(String CPF_Target) throws Exception {
+	public static void removeAllConsultaContainsCPF(String CPF_Target) {
 
-		List<Consulta> consultasCadastradas = ConsultaDAO.getConsultas();
+		List<Consulta> consultasQueContainsCPF = getAllConsultaContainsCPF(CPF_Target);
 
-		for (Consulta consultaCadastrada : consultasCadastradas) {
+		consultasQueContainsCPF.forEach(consulta -> {
 
-			if (consultaCadastrada.getCPF_medico().equals(CPF_Target)
-					|| consultaCadastrada.getCPF_paciente().equals(CPF_Target)) {
+			try {
 
-				ConsultaDAO.deleteConsulta(consultaCadastrada);
+				ConsultaDAO.deleteConsulta(consulta);
+
+			} catch (Exception e) {
+
+				e.printStackTrace();
 			}
-		}
+		});
 
 	}
 
 	/**
-	 * Metodo que remove todas as agendas de um medico
+	 * Obtém todas as consultas que contém um certo CPF, este podendo ser do médico
+	 * ou paciente.
+	 * 
+	 * @param CPF_Target cpf alvo.
+	 * @return todas as consultas que contém um dado CPF
+	 */
+
+	private static List<Consulta> getAllConsultaContainsCPF(String CPF_Target) {
+
+		List<Consulta> consultasCadastradas = ConsultaDAO.getConsultas();
+
+		return consultasCadastradas.stream().filter(consulta -> consulta.getCPF_medico().equals(CPF_Target)
+				|| consulta.getCPF_paciente().equals(CPF_Target)).collect(Collectors.toList());
+
+	}
+
+	/**
+	 * Metodo que remove todas as agendas de um médico
 	 * 
 	 * @param CPF_Target
 	 * @throws Exception
 	 */
-	public static void removeAllConsultaAgendaContainsCPF(String CPF_Target) throws Exception {
+	public static void removeAllConsultaAgendaContainsCPF_Medico(String CPF_Target) throws Exception {
+
+		List<AgendaConsulta> agendasContainsCPF = getAllAgendaContainsCPF_Medico(CPF_Target);
+
+		agendasContainsCPF.forEach(agenda -> {
+
+			try {
+
+				AgendaConsultaDAO.deleteAgendaConsulta(agenda);
+
+			} catch (Exception e) {
+
+				e.printStackTrace();
+			}
+		});
+
+	}
+
+	/**
+	 * Obtém todas as agendas que contém um dado CPF de um médico.
+	 * 
+	 * @param CPF_Target cpf alvo.
+	 * @return todas as agendas que contém um dado CPF de um médico.
+	 */
+
+	private static List<AgendaConsulta> getAllAgendaContainsCPF_Medico(String CPF_Target) {
 
 		List<AgendaConsulta> agendasCadastradas = AgendaConsultaDAO.getAgendasConsulta();
 
-		for (AgendaConsulta agendaCadastrada : agendasCadastradas) {
+		return agendasCadastradas.stream().filter(consulta -> consulta.getCPF_medico().equals(CPF_Target))
+				.collect(Collectors.toList());
 
-			if (agendaCadastrada.getCPF_medico().equals(CPF_Target)) {
-
-				AgendaConsultaDAO.deleteAgendaConsulta(agendaCadastrada);
-			}
-		}
-
-	}
-
-	/**
-	 * Retorna todas as consultas marcadas de um medico
-	 * 
-	 * @param CPF_MEDICO
-	 * @return List<Consulta>
-	 */
-	public static List<Consulta> getAllConsultasMarcadasByCPF_Medico(String CPF_MEDICO) {
-
-		List<Consulta> allConsultasMarcadas = new ArrayList<>();
-		List<Consulta> consultasCadastradas = ConsultaDAO.getConsultas();
-
-		for (Consulta consultaCadastrada : consultasCadastradas) {
-
-			if (isConsultaNotRealizada(consultaCadastrada) && consultaContainsCPF(consultaCadastrada, CPF_MEDICO)) {
-
-				allConsultasMarcadas.add(consultaCadastrada);
-			}
-		}
-
-		return allConsultasMarcadas;
 	}
 
 	/**
@@ -158,19 +177,26 @@ public class GerenciadorConsulta {
 	 */
 	public static List<Consulta> getConsultasMarcadasHojeByCPF_Medico(String CPF_MEDICO) {
 
-		List<Consulta> allConsultasMarcadas = new ArrayList<>();
+		List<Consulta> allConsultasMarcadas = getAllConsultasMarcadasByCPF_Medico(CPF_MEDICO);
+
+		return allConsultasMarcadas.stream().filter(consulta -> isConsultaMarcadaHoje(consulta))
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Retorna todas as consultas marcadas de um médico
+	 * 
+	 * @param CPF_MEDICO
+	 * @return List<Consulta>
+	 */
+	public static List<Consulta> getAllConsultasMarcadasByCPF_Medico(String CPF_MEDICO) {
+
 		List<Consulta> consultasCadastradas = ConsultaDAO.getConsultas();
 
-		for (Consulta consultaCadastrada : consultasCadastradas) {
+		return consultasCadastradas.stream()
+				.filter(consulta -> isConsultaNotRealizada(consulta) && consultaContainsCPF(consulta, CPF_MEDICO))
+				.collect(Collectors.toList());
 
-			if (isConsultaNotRealizada(consultaCadastrada) && consultaContainsCPF(consultaCadastrada, CPF_MEDICO)
-					&& isConsultaMarcadaHoje(consultaCadastrada)) {
-
-				allConsultasMarcadas.add(consultaCadastrada);
-			}
-		}
-
-		return allConsultasMarcadas;
 	}
 
 	/**
@@ -195,22 +221,23 @@ public class GerenciadorConsulta {
 	 */
 	public static List<HistoricoConsulta> getHistoryConsultasPaciente(String CPF_Paciente) {
 
-		List<Consulta> consultasCadastradas = ConsultaDAO.getConsultas();
+		List<Consulta> consultasRealizadasPaciente = getAllConsultasRealizadasByCPF_Paciente(CPF_Paciente);
+
 		List<HistoricoConsulta> historyConsultasPaciente = new ArrayList<>();
 
-		HistoricoConsulta historicoConsulta;
-
-		for (Consulta consultaCadastrada : consultasCadastradas) {
-
-			if (isConsultaRealizada(consultaCadastrada) && consultaContainsCPF(consultaCadastrada, CPF_Paciente)) {
-
-				historicoConsulta = new HistoricoConsulta(consultaCadastrada);
-
-				historyConsultasPaciente.add(historicoConsulta);
-			}
-		}
+		consultasRealizadasPaciente.forEach(consulta -> historyConsultasPaciente.add(new HistoricoConsulta(consulta)));
 
 		return historyConsultasPaciente;
+
+	}
+
+	private static List<Consulta> getAllConsultasRealizadasByCPF_Paciente(String CPF_Paciente) {
+
+		List<Consulta> consultasCadastradas = ConsultaDAO.getConsultas();
+
+		return consultasCadastradas.stream()
+				.filter(consulta -> isConsultaRealizada(consulta) && consultaContainsCPF(consulta, CPF_Paciente))
+				.collect(Collectors.toList());
 
 	}
 
@@ -234,17 +261,10 @@ public class GerenciadorConsulta {
 	public static List<AgendaConsulta> getAgendasConsultaNaoMarcadas() {
 
 		List<AgendaConsulta> agendasConsultaCadastradas = AgendaConsultaDAO.getAgendasConsulta();
-		List<AgendaConsulta> agendasConsultaNaoMarcadas = new ArrayList<>();
 
-		for (AgendaConsulta agenda : agendasConsultaCadastradas) {
+		return agendasConsultaCadastradas.stream().filter(agenda -> isAgendaNaoMaracda(agenda))
+				.collect(Collectors.toList());
 
-			if (isAgendaNaoMaracda(agenda)) {
-
-				agendasConsultaNaoMarcadas.add(agenda);
-			}
-		}
-
-		return agendasConsultaNaoMarcadas;
 	}
 
 	/**

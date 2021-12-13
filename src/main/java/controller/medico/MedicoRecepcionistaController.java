@@ -149,7 +149,7 @@ public class MedicoRecepcionistaController implements Initializable, EventHandle
 			else if (GerenciadorConsulta.hasConsultaMarcada(medicoSelecionado.getCPF())) {
 
 				GerenciadorConsulta.removeAllConsultaContainsCPF(medicoSelecionado.getCPF());
-				GerenciadorConsulta.removeAllConsultaAgendaContainsCPF(medicoSelecionado.getCPF());
+				GerenciadorConsulta.removeAllConsultaAgendaContainsCPF_Medico(medicoSelecionado.getCPF());
 			}
 
 			MedicoDAO.deleteMedico(medicoSelecionado);
