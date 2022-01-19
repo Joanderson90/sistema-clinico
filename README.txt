@@ -1,10 +1,24 @@
-IDE: eclipse jee 2021-03
-JRE: JavaSE-1.8
-Gerenciador de Pacotes: Maven
+# sistema-clinico
+Sistema para marcação de consultas.
+<h1 align="center">:hospital::stethoscope::medical_symbol: Sistema clínico JavaFX</h1>
 
-OBS: 
-- Adicionar o JavaFX nas libraries do projeto.
-- Adicionar nas libraries os arquivos da pasta lib que está no diretório onde foi instalado o JavaFX e o .jar da pasta JFX. 
-	OBS.: Ambas se encontram na raiz do projeto.
-- Qualquer duvida entrar em contato: (75) 98331-1017
-- O código está hospedado no github: https://github.com/Diego10Rocha/sistema-clinico
+## :computer: Sobre o Projeto
+Uma aplicação desktop que pode gerenciar a marcação e a realização de consultas médicas.
+
+## :page_with_curl: Features
+- Cadastro de pacientes, recepcionistas e médicos.
+- Painel de autoatendimento para pacientes.
+- Gerenciamento de médicos, pacientes, especialidades e consultas.
+- Marcação e realização de consultas.
+
+## :wrench: Recursos Utilizados
+- Eclipse 2021-09 (4.21.0)
+- Java 8
+- JavaFX (17.0.0.1)
+- SceneBuilder (8.5.0)
+- Gson (2.8.8)
+
+
+## 🖥️ Utilização
+
+<center><img src="https://github.com/Joanderson90/agenda-de-contatos/blob/main/agenda-contatos/src/image/usage.gif"></center>
