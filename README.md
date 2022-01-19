@@ -19,6 +19,3 @@ Uma aplicação desktop que pode gerenciar a marcação e a realização de cons
 - Gson (2.8.8)
 
 
-## 🖥️ Utilização
-
-
