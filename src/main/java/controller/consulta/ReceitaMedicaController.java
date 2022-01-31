@@ -40,7 +40,7 @@ public class ReceitaMedicaController {
 
 			new MessageAlert().showMessage(txtDescricao.getText(), AlertType.INFORMATION);
 			
-			Prescription.print(txtDescricao.getText(), MedicoDAO.findByCPF(Login.getCPF_userLogged()).getNome());
+			Prescription.printReceita(txtDescricao.getText(), MedicoDAO.findByCPF(Login.getCPF_userLogged()).getNome());
 		}
 
 	}
